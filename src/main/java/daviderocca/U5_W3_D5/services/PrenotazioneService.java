@@ -15,6 +15,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -41,12 +44,26 @@ public class PrenotazioneService {
         Evento eventoAssociato = eventoService.findEventoById(payload.idEvento());
         Utente utenteAssociato = utenteService.findUtenteByUsername(payload.usernameUtente());
 
+        if (eventoAssociato.getPostiDisponibili() <= 0) {
+            throw new RuntimeException("Posti esauriti per questo evento");
+        }
+
+        boolean alreadyBooked = prenotazioneRepository.existsByEventoAndUtente(eventoAssociato, utenteAssociato);
+        if (alreadyBooked) {
+            throw new RuntimeException("Hai già prenotato questo evento");
+        }
+
         Prenotazione newPrenotazione = new Prenotazione();
-        newPrenotazione.setDataPrenotazione(payload.dataPrenotazione());
+        newPrenotazione.setDataPrenotazione(payload.dataPrenotazione() != null
+                ? payload.dataPrenotazione()
+                : LocalDate.now());
         newPrenotazione.setUtente(utenteAssociato);
         newPrenotazione.setEvento(eventoAssociato);
 
         Prenotazione savedPrenotazione = this.prenotazioneRepository.save(newPrenotazione);
+
+        eventoAssociato.setPostiDisponibili(eventoAssociato.getPostiDisponibili() - 1);
+        eventoService.saveEvento2(eventoAssociato);
 
         log.info("La prenotazione con ID: " + savedPrenotazione.getId() + " è stata correttamente salvata nel DB!");
 
@@ -81,4 +98,10 @@ public class PrenotazioneService {
         this.prenotazioneRepository.delete(found);
         log.info("La prenotazione con ID: " + found.getId() + " è stata cancellata correttamente dal DB!");
     }
+
+    public List<Prenotazione> findPrenotazioniByUtente(String username) {
+        Utente found = utenteService.findUtenteByUsername(username);
+        return prenotazioneRepository.findByUtente(found);
+    }
+
 }

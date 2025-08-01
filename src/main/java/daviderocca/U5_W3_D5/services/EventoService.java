@@ -23,7 +23,7 @@ public class EventoService {
     @Autowired
     private UtenteService utenteService;
 
-    public Page<Evento> getViaggi(int page, int size, String sort) {
+    public Page<Evento> getEventi(int page, int size, String sort) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
         return eventoRepository.findAll(pageable);
     }
@@ -45,6 +45,10 @@ public class EventoService {
         log.info("L'evento con ID: " + savedEvento.getId() + " è stato correttamente salvato nel DB!");
 
         return savedEvento;
+    }
+
+    public Evento saveEvento2(Evento evento) {
+        return eventoRepository.save(evento);
     }
 
 

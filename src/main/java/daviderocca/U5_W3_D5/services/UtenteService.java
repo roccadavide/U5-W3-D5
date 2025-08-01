@@ -51,6 +51,27 @@ public class UtenteService {
         return savedUtente;
     }
 
+    public Utente saveOrganizzatore(NewUtenteDTO payload){
+
+        if(utenteRepository.existsByUsername(payload.username())) throw new BadRequestException("Username già in uso! Scegline un altro!");
+        if(utenteRepository.existsByEmail(payload.email())) throw new BadRequestException("Email già in uso! Scegline un altra!");
+
+        Utente newUtente = new Utente();
+        newUtente.setUsername(payload.username());
+        newUtente.setNome(payload.nome());
+        newUtente.setCognome(payload.cognome());
+        newUtente.setEmail(payload.email());
+        newUtente.setPassword(bcrypt.encode(payload.password()));
+        newUtente.setTipoUtente(TipoUtente.ORGANIZZATORE_EVENTI);
+
+
+        Utente savedUtente = this.utenteRepository.save(newUtente);
+
+        log.info("L'utente con username: " + savedUtente.getUsername() + " è stato correttamente salvato nel DB!");
+
+        return savedUtente;
+    }
+
     public Utente findUtenteByUsername(String username) {
         return this.utenteRepository.findById(username).orElseThrow(() -> new NotFoundException(username));
     }
