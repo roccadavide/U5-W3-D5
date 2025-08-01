@@ -1,7 +1,7 @@
-package daviderocca.U5_W2_D5.exceptions;
+package daviderocca.U5_W3_D5.exceptions;
 
-import daviderocca.U5_W2_D5.payloads.ErrorsDTO;
-import daviderocca.U5_W2_D5.payloads.ErrorsWithListDTO;
+import daviderocca.U5_W3_D5.payloads.ErrorsDTO;
+import daviderocca.U5_W3_D5.payloads.ErrorsWithListDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -13,7 +13,7 @@ import java.util.ArrayList;
 @RestControllerAdvice
 public class ExceptionsHandler {
 
-        @ExceptionHandler(ValidationException.class)
+        @ExceptionHandler(daviderocca.U5_W3_D5.exceptions.ValidationException.class)
         @ResponseStatus(HttpStatus.BAD_REQUEST)
         public ErrorsWithListDTO handleValidationErrors(ValidationException ex) {
 
